@@ -1,16 +1,23 @@
 package espresso.web.netty;
 
+import espresso.agent.Agents;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * @author dhanji@gmail.com (Dhanji R. Prasanna)
  */
-public class NettyResponse extends DefaultHttpResponse {
+public class NettyResponse extends DefaultHttpResponse implements ChannelFutureListener {
+  private Callback callback;
+
   /**
    * Creates a new instance.
    *
@@ -35,5 +42,30 @@ public class NettyResponse extends DefaultHttpResponse {
 
   public void setStatus(int status) {
     setStatus(new HttpResponseStatus(status, Integer.toString(status)));
+  }
+
+  public void setCallback(Scriptable thisObj, Function function) {
+    this.callback = new Callback(thisObj, function);
+  }
+
+  @Override
+  public void operationComplete(ChannelFuture future) throws Exception {
+    // Call back if necessary & close channel.
+    try {
+      if (callback != null)
+        Agents.dispatch(null, callback.thisObj, callback.function);
+    } finally {
+      ChannelFutureListener.CLOSE.operationComplete(future);
+    }
+  }
+
+  private static class Callback {
+    private final Scriptable thisObj;
+    private final Function function;
+
+    private Callback(Scriptable thisObj, Function function) {
+      this.thisObj = thisObj;
+      this.function = function;
+    }
   }
 }

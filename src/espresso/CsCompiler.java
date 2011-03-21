@@ -155,7 +155,7 @@ public class CsCompiler {
       context.evaluateString(scope, base, ESPRESSO_BASE, 0, null);
 
       // Add the ability to look up libraries.
-      ScriptableObject.putProperty(scope, "espresso", Context.javaToJS(coreJsObject, scope));
+      ScriptableObject.putProperty(scope, "espresso_core", Context.javaToJS(coreJsObject, scope));
 
       for (Map.Entry<String, Object> entry : seeds.entrySet()) {
         ScriptableObject.putProperty(scope, entry.getKey(),

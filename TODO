@@ -1,0 +1,27 @@
+TODO
+----
+
+- simple data store
+- http client api
+- text manipulation api
+- collections api (iterables?)
+  - sort, shuffle, fill, reverse
+- json/object api
+
+
+maybes
+- sql
+- flags
+- xml parse/emit (xstream?)
+- shared memory key/value store?
+- interprocess rpc api (thrift? msgpack? just json?)
+- net/socket api?
+- data structures api
+  - red/black tree
+  - multimap
+  - queues/deques
+  - prefix trie
+  - table
+  - max/min heap
+
+tkt #358875

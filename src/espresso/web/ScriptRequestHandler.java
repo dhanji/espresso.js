@@ -6,12 +6,10 @@ import espresso.web.netty.NettyRequest;
 import espresso.web.netty.NettyResponse;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.mozilla.javascript.Context;
@@ -33,7 +31,7 @@ class ScriptRequestHandler extends SimpleChannelUpstreamHandler {
   @Override
   public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     HttpRequest request = (HttpRequest) e.getMessage();
-    HttpResponse response = new NettyResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+    NettyResponse response = new NettyResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
     // Set up the appropriate javascript:
     Context.enter();
@@ -46,7 +44,7 @@ class ScriptRequestHandler extends SimpleChannelUpstreamHandler {
     loader.reload("main");
 
     // We always run main.coffee for the routes, and add dispatch command at the end.
-    compiler.evaluate("main", loader.get("main") + "\nhttp_dispatch()", seeds);
+    compiler.evaluate("main", loader.get("main") + "\nespresso.http_dispatch()", seeds);
     Context.exit();
 
     // Render response!
@@ -54,6 +52,6 @@ class ScriptRequestHandler extends SimpleChannelUpstreamHandler {
     ChannelFuture future = channel.write(response);
 
     // Close the out channel when it is done writing.
-    future.addListener(ChannelFutureListener.CLOSE);
+    future.addListener(response);
   }
 }

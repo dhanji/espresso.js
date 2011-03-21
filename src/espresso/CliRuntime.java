@@ -10,7 +10,14 @@ import java.io.IOException;
  */
 public class CliRuntime {
   public static void main(String...args) throws IOException {
+    // Set up options and flags.
+    Options.set(args);
+
     // Load coffee program.
+    if (args.length == 0) {
+      System.out.println("Usage:\nespresso <file.coffee|js> [flags]");
+      System.exit(1);
+    }
     String file = args[0];
 
     CsCompiler compiler = new CsCompiler();

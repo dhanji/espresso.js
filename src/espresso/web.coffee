@@ -1,12 +1,17 @@
 # web routes and dispatching.
 
 routes = {}
+regex_routes = {}
 
 global.match = (pattern, handler) ->
-  routes[pattern] = handler
+  if typeof pattern == 'string'
+    routes[pattern] = handler
+  else
+    regex_routes[pattern] = handler
 
-global.http_dispatch = () ->
+global.espresso.http_dispatch = () ->
   handler = routes[request.uri]
+
   if not handler?
     response.setStatus 404, 'Not Found'
   else
@@ -23,6 +28,8 @@ global.http_dispatch = () ->
           response.setStatus(result.status) if result.status?
           response.setBody(result.body) if result.body?
           response.setHeader(result.content_type) if result.content_type?
+          response.setCallback(result, result.callback) if result.callback?
           if result.headers?
             for name, value of result.headers
               response.addHeader name, value
+

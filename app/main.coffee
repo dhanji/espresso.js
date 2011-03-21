@@ -3,7 +3,7 @@ require "espresso/template"
 
 match '/'
   get: ->
-    markdown 'index'
+    body: markdown 'index'
 
   post: ->
     "bye"
